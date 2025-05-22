@@ -3,6 +3,7 @@ provider "google" {
   region  = "northamerica-south1"  # Replace with your desired region
 }
 
+/*
 resource "google_compute_instance" "vm_instance" {
   name         =  "vm0"
   machine_type = "e2-micro"  # Replace with your desired machine type
@@ -26,3 +27,4 @@ resource "google_compute_instance" "vm_instance" {
 output "instance_private_ip" {
   value = google_compute_instance.vm_instance.network_interface[0].network_ip
 }
+*/
