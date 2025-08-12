@@ -2,44 +2,54 @@
 - hosts: all
   become: yes  # Ensure commands run as root
   tasks:
-    - name: Install tools
-      yum:
+    - name: Install dependencies
+      ansible.builtin.apt:
         name:
-          - yum-utils
-          - wget
+          - ca-certificates
+          - curl
+          - gnupg
           - git
           - python3
           - python3-pip
-          - epel-release
         state: present
         update_cache: yes
 
-    - name: Add Docker repository
-      shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    - name: Add Docker's official GPG key
+      ansible.builtin.shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
       args:
-        creates: /etc/yum.repos.d/docker-ce.repo
+        creates: /etc/apt/keyrings/docker.gpg
 
-    - name: Install Docker
-      yum:
+    - name: Add Docker repository to APT sources
+      ansible.builtin.shell: |
+        echo "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable" | tee /etc/apt/sources.list.d/docker.list
+      args:
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Install Docker packages
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
           - containerd.io
         state: present
+        update_cache: yes
 
     - name: Start and enable Docker service
-      systemd:
+      ansible.builtin.service:
         name: docker
         state: started
         enabled: yes
 
     - name: Install Harness Delegate (Docker-based)
       shell: |
-        docker run -d --cpus=1 --memory=2g --network=host \
-        -e DELEGATE_NAME=docker-delegate-mig-ansible \
-        -e NEXT_GEN="true" \
-        -e DELEGATE_TYPE="DOCKER" \
-        -e ACCOUNT_ID=ucHySz2jQKKWQweZdXyCog \
-        -e DELEGATE_TOKEN=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY= \
-        -e DELEGATE_TAGS="" \
-        -e MANAGER_HOST_AND_PORT=https://app.harness.io us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.04.85701
+        docker run  -d --cpus=1 --memory=2g \
+          -e DELEGATE_NAME=docker-reethu \
+          -e NEXT_GEN="true" \
+          -e DELEGATE_TYPE="DOCKER" \
+          -e ACCOUNT_ID=ucHySz2jQKKWQweZdXyCog \
+          -e DELEGATE_TOKEN=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY= \
+          -e DELEGATE_TAGS="" \
+          -e MANAGER_HOST_AND_PORT=https://app.harness.io us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.07.86401
