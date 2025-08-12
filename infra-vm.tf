@@ -1,5 +1,5 @@
 provider "google" {
-  project = "static-epigram-458808-h4"
+  project = "ritu-pro"
   region  = "northamerica-south1"  # Replace with your desired region
 }
 
