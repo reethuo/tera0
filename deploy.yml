@@ -24,7 +24,13 @@
         state: present
         update_cache: yes
     
-    # This is the single, correct way to add the repository and GPG key
+    # This task downloads the GPG key to the correct location
+    - name: Download and install Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /usr/share/keyrings/docker-archive-keyring.gpg
+        mode: '0644'
+
     - name: Add Docker repository and GPG key
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
