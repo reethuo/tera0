@@ -46,7 +46,7 @@
       ansible.builtin.apt:
         name:
           - docker.io
-          - containerd.io
+          - containerd
         state: present
         update_cache: yes
 
