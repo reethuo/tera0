@@ -40,7 +40,7 @@
     - name: Install Docker packages
       ansible.builtin.apt:
         name:
-          - docker-ce
+          - docker.io
           - docker-ce-cli
           - containerd.io
         state: present
