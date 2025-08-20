@@ -24,14 +24,23 @@
         state: present
         update_cache: yes
     
-    # This is the single, correct way to add the repository and GPG key
-    - name: Add Docker repository and GPG key
+    # Use the apt_key module to add the GPG key
+    - name: Add Docker's official GPG key via apt_key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+    
+    # Add Docker repository without the signed_by parameter
+    - name: Add Docker repository to APT sources
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
         state: present
         filename: docker
-        signed_by: https://download.docker.com/linux/debian/gpg
-    
+        
+    - name: Update apt cache before installing Docker
+      ansible.builtin.apt:
+        update_cache: yes
+
     - name: Install Docker packages
       ansible.builtin.apt:
         name:
@@ -39,7 +48,7 @@
           - docker-ce-cli
           - containerd.io
         state: present
-        update_cache: yes # Ensure the cache is updated just before install
+        update_cache: yes
 
     - name: Start and enable Docker service
       ansible.builtin.service:
