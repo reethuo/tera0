@@ -24,29 +24,14 @@
         state: present
         update_cache: yes
     
-    # Use the get_url module to download the GPG key to a temporary location
-    - name: Download Docker's official GPG key
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/debian/gpg
-        dest: /tmp/docker.gpg
-        mode: '0644'
-    
-    # Use a command to dearmor and install the key
-    - name: Add Docker's official GPG key to trusted keyring
-      ansible.builtin.shell: |
-        sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg < /tmp/docker.gpg
-
-    # Add Docker repository to APT sources
-    - name: Add Docker repository to APT sources
+    # This is the single, correct way to add the repository and GPG key
+    - name: Add Docker repository and GPG key
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
         state: present
         filename: docker
-        
-    - name: Update apt cache before installing Docker
-      ansible.builtin.apt:
         update_cache: yes
-
+    
     - name: Install Docker packages
       ansible.builtin.apt:
         name:
