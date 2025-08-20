@@ -24,7 +24,6 @@
         state: present
         update_cache: yes
     
-    # Use a command to install the GPG key directly, which is more reliable
     - name: Install Docker's official GPG key via command
       ansible.builtin.shell: |
         install -m 0755 -d /etc/apt/keyrings
@@ -33,7 +32,6 @@
       args:
         creates: /etc/apt/keyrings/docker.gpg
     
-    # Add Docker repository to APT sources
     - name: Add Docker repository to APT sources
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
@@ -51,6 +49,7 @@
           - docker-ce-cli
           - containerd.io
         state: present
+        update_cache: yes # Add this line to force cache update
 
     - name: Start and enable Docker service
       ansible.builtin.service:
