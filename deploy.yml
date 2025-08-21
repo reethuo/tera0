@@ -35,7 +35,7 @@
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Add Docker repository and GPG key
+    - name: Add Docker repository
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
         state: present
