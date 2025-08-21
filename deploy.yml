@@ -9,7 +9,7 @@
 
     - name: Remove old Docker repository source file if it exists
       ansible.builtin.file:
-        path: /etc/apt/sources.list.d/docker.list
+        path: ./docker #/etc/apt/sources.list.d/docker.list
         state: absent
 
     - name: Install dependencies
